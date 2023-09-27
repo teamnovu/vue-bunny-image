@@ -1,0 +1,66 @@
+{
+  "name": "@teamnovu/vue-bunny-image",
+  "version": "1.0.0",
+  "description": "Simple bunny Image component for vue",
+  "repository": "teamnovu/vue-bunny-image",
+  "license": "MIT",
+  "main": "dist/bunny-image.ssr.js",
+  "browser": "dist/bunny-image.esm.js",
+  "module": "dist/bunny-image.esm.js",
+  "unpkg": "dist/bunny-image.min.js",
+  "files": [
+    "dist/*",
+    "src/**/*.vue"
+  ],
+  "scripts": {
+    "serve": "vue-cli-service serve dev/serve.js",
+    "lint": "eslint . --ext .js,.vue",
+    "lint:fix": "eslint . --ext .js,.vue --fix",
+    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
+    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
+    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
+    "prepublishOnly": "npm run build",
+    "release": "standard-version && git push --follow-tags && npm publish"
+  },
+  "dependencies": {
+    "ufo": "^0.7.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@rollup/plugin-alias": "^2.2.0",
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@rollup/plugin-replace": "^2.3.2",
+    "@vue/cli-plugin-babel": "^4.3.1",
+    "@vue/cli-plugin-eslint": "^4.5.9",
+    "@vue/cli-service": "^4.3.1",
+    "babel-eslint": "^10.0.1",
+    "cross-env": "^7.0.2",
+    "eslint": "^7.16.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-vue": "^7.4.0",
+    "minimist": "^1.2.5",
+    "rollup": "^2.7.3",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-vue": "^5.1.6",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11",
+    "standard-version": "latest"
+  },
+  "peerDependencies": {
+    "vue": "^2.6.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10"
+  }
+}
