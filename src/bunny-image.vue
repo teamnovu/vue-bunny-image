@@ -152,7 +152,7 @@ export default {
       }
 
       if (this.aspectRatio && this.height && Number(this.height) > 0) {
-        return this.height * this.aspectRatio
+        return this.height * this.aspectRatioFloat
       }
 
       return this.largestBreakpointSize
@@ -164,19 +164,24 @@ export default {
       }
 
       if (this.aspectRatio && this.width && Number(this.width) > 0) {
-        return this.width / this.aspectRatio
+        return this.width / this.aspectRatioFloat
       }
 
       if (this.aspectRatio) {
-        return this.largestBreakpointSize / this.aspectRatio
+        return this.largestBreakpointSize / this.aspectRatioFloat
       }
 
       return undefined
     },
 
+    aspectRatioFloat () {
+      if ((this.aspectRatio + '').includes(':')) return this.aspectRatio.split(':')[0] / this.aspectRatio.split(':')[1]
+      else return this.aspectRatio
+    },
+
     imgAspectRatio () {
       if (this.aspectRatio) {
-        return this.aspectRatio
+        return this.aspectRatioFloat
       }
 
       if (this.imgWidth && this.imgHeight) {
@@ -304,7 +309,7 @@ export default {
         if (aspectRatio) {
         // support either 0.5 or 1:2 formats
           if ((aspectRatio + '').includes(':')) transformations.push(`aspect_ratio=${aspectRatio}`)
-          else transformations.push(`aspect_ratio=1:${aspectRatio}`)
+          else transformations.push(`aspect_ratio=1:${1 / aspectRatio}`)
         }
         if (quality) transformations.push(`quality=${quality}`)
         if (sharpen) transformations.push(`sharpen=${sharpen}`)

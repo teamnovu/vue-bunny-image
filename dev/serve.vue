@@ -29,9 +29,25 @@ export default Vue.extend({
           objectFit: 'cover',
         }"
         src="/assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
-        :aspect-ratio="2"
-        :brightness="50"
-        :flip="true"
+        :aspect-ratio="0.5"
+        :brightness="30"
+        :flop="true"
+      />
+    </div>
+
+    <div>
+      <BunnyImage
+        :width="200"
+        src="assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
+        :aspect-ratio="1.5"
+      />
+    </div>
+
+    <div>
+      <BunnyImage
+        :width="200"
+        src="assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
+        aspect-ratio="3:2"
       />
     </div>
   </div>
