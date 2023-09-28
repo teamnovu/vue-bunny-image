@@ -22,7 +22,8 @@ const install = function installbunnyImage (Vue, options) {
   if (
     !bunnyBaseUrl ||
     typeof bunnyBaseUrl !== 'string' ||
-    bunnyBaseUrl.length === 0
+    bunnyBaseUrl.length === 0 ||
+    bunnyBaseUrl.endsWith('/')
   ) {
     throw new Error('bunnyBaseUrl was not properly configured.')
   }

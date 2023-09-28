@@ -7,7 +7,6 @@
     :sizes="imgSizes"
     :width="imgWidth"
     :height="imgHeight"
-    :aspect-ratio="imgAspectRatio"
     @load="onLoaded"
   >
   <img
@@ -15,7 +14,6 @@
     :src="originalUrl"
     :width="imgWidth"
     :height="imgHeight"
-    :aspect-ratio="imgAspectRatio"
   >
 </template>
 
@@ -28,94 +26,60 @@ function print (level, ...message) {
     ...message,
   )
 }
-// eslint-disable-next-line no-unused-vars
-function log (...message) { print('log', ...message) }
-function warn (...message) { print('warn', ...message) }
+
+const prop = (type, required = false, defaultValue = undefined) => ({
+  type,
+  required,
+  default: defaultValue,
+})
 
 export default {
   props: {
-    src: {
-      required: true,
-      type: String,
-    },
-    quality: {
-      required: false,
-      type: [Number, String],
-      default: 'auto',
-    },
-    blur: {
-      required: false,
-      type: Number,
-      default: undefined,
-    },
-    crop: {
-      required: false,
-      type: String,
-      default: undefined,
-    },
-    format: {
-      required: false,
-      type: String,
-      default: undefined,
-    },
-    aspectRatio: {
-      required: false,
-      type: [Number, String],
-      default: undefined,
-    },
-    placeholderQuality: {
-      required: false,
-      type: Number,
-      default: 30,
-    },
-    placeholderWidth: {
-      required: false,
-      type: Number,
-      default: 300,
-    },
-    usePlaceholder: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
-    placeholderDataUrl: {
-      required: false,
-      type: String,
-      default: undefined,
-    },
-    focal: {
-      required: false,
-      type: [Array, String],
-      default: undefined,
-    },
-    fallbackWidth: {
-      required: false,
-      type: Number,
-      default: 2000,
-    },
-    width: {
-      type: [String, Number],
-      default: undefined,
-    },
-    height: {
-      type: [String, Number],
-      default: undefined,
-    },
-    zoom: {
-      required: false,
-      type: [String, Number],
-      default: undefined,
-    },
-    transforms: {
-      required: false,
-      type: [String, Object],
-      default: undefined,
-    },
-    sizes: {
-      required: false,
-      type: String,
-      default: undefined,
-    },
+    src: prop(String, true),
+    sizes: prop(String),
+    width: prop(Number),
+    height: prop(Number),
+    aspectRatio: prop([Number, String]),
+    quality: prop(Number),
+    sharpen: prop(Boolean),
+    blur: prop(Number),
+    crop: prop(String),
+    cropGravity: prop(String),
+    flip: prop(Boolean),
+    flop: prop(Boolean),
+    brightness: prop(Number),
+    saturation: prop(Number),
+    hue: prop(Number),
+    contrast: prop(Number),
+    optimization: prop(String),
+    sepia: prop(Number),
+
+    // placeholder
+    placeholderQuality: prop(Number, false, 30),
+    placeholderWidth: prop(Number, false, 300),
+    usePlaceholder: prop(Boolean, false, true),
+    placeholderDataUrl: prop(String),
+
+    /**
+     * @deprecated
+     */
+    format: prop(String),
+    /**
+     * @deprecated
+     */
+    focal: prop([Array, String]),
+    /**
+     * @deprecated
+     */
+    fallbackWidth: prop(Number, false, 2000),
+    /**
+     * @deprecated
+     */
+    zoom: prop([String, Number]),
+    /**
+     * @deprecated
+     */
+    transforms: prop([String, Object]),
   },
   data () {
     return {
@@ -130,26 +94,29 @@ export default {
 
       return (
         fileExtension &&
-        ['jpg', 'png', 'gif', 'webp', 'jpeg', 'avif'].includes(fileExtension.toLowerCase())
+        ['jpg', 'png', 'gif', 'webp', 'jpeg'].includes(fileExtension.toLowerCase())
       )
     },
+
     breakpointSizes () {
       return this.screens.map((screen) => screen.size.replace('px', ''))
     },
+
     largestBreakpointSize () {
       return this.breakpointSizes[0]
     },
+
+    bunnySrc () {
+      if (this.src.startsWith('/')) return this.$bunnyImage.bunnyBaseUrl + this.src
+      else return this.$bunnyImage.bunnyBaseUrl + '/' + this.src
+    },
+
     imgSrcSet () {
       const srcSet = this.breakpointSizes.map(
         (breakpointSize) =>
           this.generateSrc({
-            quality: this.quality,
+            ...this.$props,
             width: breakpointSize,
-            format: this.format,
-            aspectRatio: this.aspectRatio,
-            crop: this.crop,
-            focal: this.focal,
-            zoom: this.zoom,
           }) + ` ${breakpointSize}w`,
       )
 
@@ -159,36 +126,26 @@ export default {
 
       return srcSet.join(',')
     },
+
     originalUrl () {
       return this.generateSrc({
-        quality: this.quality,
-        blur: this.blur,
-        width: this.fallbackWidth,
-        format: this.format,
-        aspectRatio: this.aspectRatio,
-        crop: this.crop,
-        focal: this.focal,
-        zoom: this.zoom,
-        transforms: this.transforms,
+        ...this.$props,
       })
     },
+
     placeholderUrl () {
       if (this.placeholderDataUrl && !this.aspectRatio) {
         return this.placeholderDataUrl
       }
 
       return this.generateSrc({
+        ...this.$props,
         quality: this.placeholderQuality,
         width: this.placeholderWidth,
-        format: this.format,
-        aspectRatio: this.aspectRatio,
-        crop: this.crop,
-        focal: this.focal,
         placeholder: true,
-        zoom: this.zoom,
-        transforms: this.transforms,
       })
     },
+
     imgWidth () {
       if ((this.width && this.height) || (this.width && this.aspectRatio)) {
         return this.width
@@ -200,6 +157,7 @@ export default {
 
       return this.largestBreakpointSize
     },
+
     imgHeight () {
       if ((this.width && this.height) || (this.height && this.aspectRatio)) {
         return this.height
@@ -215,6 +173,7 @@ export default {
 
       return undefined
     },
+
     imgAspectRatio () {
       if (this.aspectRatio) {
         return this.aspectRatio
@@ -226,10 +185,12 @@ export default {
 
       return undefined
     },
+
     imgSizes () {
       return this.sizes || this.internalSizes
     },
   },
+
   created () {
     const screens = Object.entries(this.$bunnyImage.screenSizes)
       .map(([key, value]) => ({
@@ -241,13 +202,17 @@ export default {
 
     this.screens = screens
   },
+
   mounted () {
     window.addEventListener('resize', this.onResize, { passive: true })
   },
+
   beforeDestroy () {
     window.removeEventListener('resize', this.onResize)
   },
+
   methods: {
+
     updateSizes () {
       return new Promise((resolve) => {
         window.requestAnimationFrame(() => {
@@ -288,66 +253,88 @@ export default {
         })
       })
     },
+
     onResize () {
       this.updateSizes()
     },
+
     async onLoaded () {
       await this.updateSizes()
       this.isLoading = false
     },
+
     generateSrc ({
-      quality,
-      sharpen,
+      placeholder = false,
+
       width,
       height,
       aspectRatio,
+      quality,
+      sharpen,
       blur,
       crop,
+      cropGravity,
+      flip,
+      flop,
+      brightness,
+      saturation,
+      hue,
+      contrast,
+      optimization,
+      sepia,
+
       format,
       focal,
-      placeholder = false,
       zoom,
       transforms: additionalTransforms,
     }) {
-      if (!this.fileTypeSupported) {
-        return this.$bunnyImage.bunnyBaseUrl + this.src
-      }
+      if (!this.fileTypeSupported) return this.bunnySrc
 
       const transformations = []
 
-      if (!placeholder) {
-        if (quality) transformations.push(`quality=${quality}`)
-        if (sharpen) transformations.push(`sharpen=${sharpen}`)
-        if (blur) {
-          if (blur < 0 || blur > 100) warn('blur is out of range', { blur })
-          transformations.push(`blur=${Math.min(100, blur)}`)
-        }
-        if (format) warn('format is not supported', { format })
-        if (crop && crop !== 'fill') warn('crop is not supported', { crop })
-        if (additionalTransforms) {
-          warn('additionalTransforms are not supported', { additionalTransforms })
-        }
-        if (zoom) warn('zoom is not supported', { zoom })
-        if (width) transformations.push(`width=${width}`)
-        if (height) transformations.push(`height=${height}`)
-      } else {
+      if (placeholder) {
         if (this.$bunnyImage.placeholderTransformation) {
           transformations.push(`${this.$bunnyImage.placeholderTransformation}`)
         } else {
-          transformations.push('blur=100')
-          transformations.push('width=100')
-          transformations.push('quality=20')
+          transformations.push('blur=80', 'width=150', 'quality=20')
         }
-      }
+      } else {
+        if (width) transformations.push(`width=${width}`)
+        if (height) transformations.push(`height=${height}`)
+        if (aspectRatio) {
+        // support either 0.5 or 1:2 formats
+          if ((aspectRatio + '').includes(':')) transformations.push(`aspect_ratio=${aspectRatio}`)
+          else transformations.push(`aspect_ratio=1:${aspectRatio}`)
+        }
+        if (quality) transformations.push(`quality=${quality}`)
+        if (sharpen) transformations.push(`sharpen=${sharpen}`)
+        if (blur) {
+          if (blur < 0 || blur > 100) print('warn', 'blur is out of range', { blur })
+          transformations.push(`blur=${Math.min(100, blur)}`)
+        }
+        if (crop && crop !== 'fill') print('warn', 'crop is not supported', { crop })
+        if (cropGravity) transformations.push(`crop_gravity=${cropGravity}`)
+        if (flip) transformations.push(`flip=${flip}`)
+        if (flop) transformations.push(`flop=${flop}`)
+        if (brightness) {
+          if (brightness < -100 || brightness > 100) print('warn', 'brightness is out of range', { brightness })
+          transformations.push(`brightness=${brightness}`)
+        }
+        if (saturation) transformations.push(`saturation=${saturation}`)
+        if (hue) transformations.push(`hue=${hue}`)
+        if (contrast) transformations.push(`contrast=${contrast}`)
+        if (optimization) transformations.push(`optimization=${optimization}`)
+        if (sepia) transformations.push(`sepia=${sepia}`)
 
-      // support either 0.5 or 1:2 formats
-      if (aspectRatio) {
-        if ((aspectRatio + '').includes(':')) transformations.push(`aspect_ratio=${aspectRatio}`)
-        else transformations.push(`aspect_ratio=1:${aspectRatio}`)
+        if (format) print('warn', 'format is not supported', { format })
+        if (additionalTransforms) {
+          print('warn', 'additionalTransforms are not supported', { additionalTransforms })
+        }
+        if (zoom) print('warn', 'zoom is not supported', { zoom })
       }
 
       if (focal) {
-        warn('focal is not supported', { focal })
+        print('warn', 'focal is not yet supported', { focal })
         if (Array.isArray(focal)) {
           // transformations.push(`x_${focal[0]},y_${focal[1]},g_xy_center`)
         } else {
@@ -355,9 +342,7 @@ export default {
         }
       }
 
-      return this.$bunnyImage.bunnyBaseUrl +
-        this.src +
-        (transformations.length > 0 ? '?' + transformations.join('&') : '')
+      return this.bunnySrc + (transformations.length > 0 ? '?' + transformations.join('&') : '')
     },
   },
 }

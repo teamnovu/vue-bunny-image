@@ -18,9 +18,6 @@ export default Vue.extend({
         crop="fill"
         :width="200"
         :aspect-ratio="1"
-        :transforms="{
-          a: '90',
-        }"
       />
     </div>
 
@@ -32,11 +29,9 @@ export default Vue.extend({
           objectFit: 'cover',
         }"
         src="/assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
-        crop="fill"
         :aspect-ratio="2"
-        :transforms="{
-          a: '90',
-        }"
+        :brightness="50"
+        :flip="true"
       />
     </div>
   </div>
