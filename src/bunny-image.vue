@@ -20,7 +20,17 @@
 </template>
 
 <script>
-import { joinURL, encodePath } from 'ufo'
+function print (level, ...message) {
+  if (process.env.NODE_ENV !== 'development') return
+  console[level](
+    '%cBunnyImage',
+    'color: white; background-color: rgba(239, 96, 39, 1); padding: 2px 4px; border-radius: 2px;',
+    ...message,
+  )
+}
+// eslint-disable-next-line no-unused-vars
+function log (...message) { print('log', ...message) }
+function warn (...message) { print('warn', ...message) }
 
 export default {
   props: {
@@ -41,16 +51,16 @@ export default {
     crop: {
       required: false,
       type: String,
-      default: 'lfill',
+      default: undefined,
     },
     format: {
       required: false,
       type: String,
-      default: 'auto',
+      default: undefined,
     },
     aspectRatio: {
       required: false,
-      type: Number,
+      type: [Number, String],
       default: undefined,
     },
     placeholderQuality: {
@@ -76,7 +86,7 @@ export default {
     focal: {
       required: false,
       type: [Array, String],
-      default: 'auto',
+      default: undefined,
     },
     fallbackWidth: {
       required: false,
@@ -287,7 +297,9 @@ export default {
     },
     generateSrc ({
       quality,
+      sharpen,
       width,
+      height,
       aspectRatio,
       blur,
       crop,
@@ -298,63 +310,54 @@ export default {
       transforms: additionalTransforms,
     }) {
       if (!this.fileTypeSupported) {
-        return joinURL(this.$bunnyImage.bunnyBaseUrl, encodePath(this.src))
+        return this.$bunnyImage.bunnyBaseUrl + this.src
       }
 
       const transformations = []
 
       if (!placeholder) {
-        if (width) transformations.push(`w_${width}`)
-        if (quality) transformations.push(`q_${quality}`)
-        if (blur) transformations.push(`e_blur:${blur}`)
-        if (format) transformations.push(`f_${format}`)
-        if (zoom) transformations.push(`z_${zoom}`)
-        if (width && aspectRatio) {
-          transformations.push(`h_${Math.round(width / aspectRatio)}`)
-        } else if (!width && aspectRatio) {
-          transformations.push(`ar_${aspectRatio}`)
+        if (quality) transformations.push(`quality=${quality}`)
+        if (sharpen) transformations.push(`sharpen=${sharpen}`)
+        if (blur) {
+          if (blur < 0 || blur > 100) warn('blur is out of range', { blur })
+          transformations.push(`blur=${Math.min(100, blur)}`)
         }
+        if (format) warn('format is not supported', { format })
+        if (crop && crop !== 'fill') warn('crop is not supported', { crop })
+        if (additionalTransforms) {
+          warn('additionalTransforms are not supported', { additionalTransforms })
+        }
+        if (zoom) warn('zoom is not supported', { zoom })
+        if (width) transformations.push(`width=${width}`)
+        if (height) transformations.push(`height=${height}`)
       } else {
         if (this.$bunnyImage.placeholderTransformation) {
-          transformations.push(`t_${this.$bunnyImage.placeholderTransformation}`)
+          transformations.push(`${this.$bunnyImage.placeholderTransformation}`)
         } else {
-          transformations.push('e_blur:2000,f_auto,q_auto:eco,w_300,z_1.1')
+          transformations.push('blur=100')
+          transformations.push('width=100')
+          transformations.push('quality=20')
         }
-        if (aspectRatio) transformations.push(`ar_${aspectRatio}`)
       }
-      if (crop) transformations.push(`c_${crop}`)
 
-      if (focal && ['crop', 'fill', 'lfill', 'lpad', 'mpad', 'pad', 'thumb'].includes(this.crop)) {
+      // support either 0.5 or 1:2 formats
+      if (aspectRatio) {
+        if ((aspectRatio + '').includes(':')) transformations.push(`aspect_ratio=${aspectRatio}`)
+        else transformations.push(`aspect_ratio=1:${aspectRatio}`)
+      }
+
+      if (focal) {
+        warn('focal is not supported', { focal })
         if (Array.isArray(focal)) {
-          transformations.push(`x_${focal[0]},y_${focal[1]},g_xy_center`)
+          // transformations.push(`x_${focal[0]},y_${focal[1]},g_xy_center`)
         } else {
-          transformations.push(`g_${focal}`)
+          // transformations.push(`g_${focal}`)
         }
       }
 
-      if (additionalTransforms) {
-        if (typeof additionalTransforms === 'object') {
-          Object.entries(additionalTransforms).forEach(([key, value]) => {
-            transformations.push(`${key}_${value}`)
-          })
-        } else {
-          transformations.push(additionalTransforms)
-        }
-      }
-
-      const remoteFolderMapping = this.$bunnyImage.bunnyBaseUrl.match(/\/image\/upload\/(.*)/)
-
-      // Handle delivery remote media file URLs
-      // Note: Non-remote images will pass into this function if the baseURL is not using a sub directory
-      if (remoteFolderMapping?.length >= 1) {
-        // need to do some weird logic to get the remote folder after image/upload after the operations and before the src
-        const remoteFolder = remoteFolderMapping[1]
-        const baseURLWithoutRemoteFolder = this.$bunnyImage.bunnyBaseUrl.replace(new RegExp(`${remoteFolder}$`), '')
-
-        return joinURL(baseURLWithoutRemoteFolder, transformations.join(','), remoteFolder, encodePath(this.src))
-      }
-
-      return joinURL(this.$bunnyImage.bunnyBaseUrl, transformations.join(','), encodePath(this.src))
+      return this.$bunnyImage.bunnyBaseUrl +
+        this.src +
+        (transformations.length > 0 ? '?' + transformations.join('&') : '')
     },
   },
 }

@@ -13,7 +13,7 @@ Vue.prototype.$bunnyImage = {
     '2xl': '1600px',
     '3xl': '2000px',
   },
-  bunnyBaseUrl: 'https://res.bunny.com/hep-verlag/image/upload/',
+  bunnyBaseUrl: 'https://stage-walde.b-cdn.net',
 }
 
 new Vue({

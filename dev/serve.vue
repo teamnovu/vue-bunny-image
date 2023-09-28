@@ -1,11 +1,11 @@
 <script>
 import Vue from 'vue'
-import bunnyImage from '@/bunny-image.vue'
+import BunnyImage from '@/bunny-image.vue'
 
 export default Vue.extend({
   name: 'ServeDev',
   components: {
-    bunnyImage,
+    BunnyImage,
   },
 })
 </script>
@@ -13,8 +13,8 @@ export default Vue.extend({
 <template>
   <div id="app">
     <div>
-      <bunny-image
-        src="/sample.jpg"
+      <BunnyImage
+        src="/assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
         crop="fill"
         :width="200"
         :aspect-ratio="1"
@@ -25,13 +25,13 @@ export default Vue.extend({
     </div>
 
     <div>
-      <bunny-image
+      <BunnyImage
         :style="{
           width: '100px',
           height: '200px',
           objectFit: 'cover',
         }"
-        src="/sample.jpg"
+        src="/assets/Horgen_2019_W_Seegartenstr.-84_80.63.624_8063624_22.jpg"
         crop="fill"
         :aspect-ratio="2"
         :transforms="{
