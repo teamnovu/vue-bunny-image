@@ -59,27 +59,6 @@ export default {
     placeholderWidth: prop(Number, false, 300),
     usePlaceholder: prop(Boolean, false, true),
     placeholderDataUrl: prop(String),
-
-    /**
-     * @deprecated
-     */
-    format: prop(String),
-    /**
-     * @deprecated
-     */
-    focal: prop([Array, String]),
-    /**
-     * @deprecated
-     */
-    fallbackWidth: prop(Number, false, 2000),
-    /**
-     * @deprecated
-     */
-    zoom: prop([String, Number]),
-    /**
-     * @deprecated
-     */
-    transforms: prop([String, Object]),
   },
   data () {
     return {
@@ -197,15 +176,13 @@ export default {
   },
 
   created () {
-    const screens = Object.entries(this.$bunnyImage.screenSizes)
+    this.screens = Object.entries(this.$bunnyImage.screenSizes)
       .map(([key, value]) => ({
         breakpoint: key,
         media: `min-width: ${value}`,
         size: value,
       }))
       .sort((a, b) => +b.size.replace('px', '') - +a.size.replace('px', ''))
-
-    this.screens = screens
   },
 
   mounted () {
@@ -288,10 +265,6 @@ export default {
       optimization,
       sepia,
 
-      format,
-      focal,
-      zoom,
-      transforms: additionalTransforms,
     }) {
       if (!this.fileTypeSupported) return this.bunnySrc
 
@@ -330,21 +303,6 @@ export default {
         if (contrast) transformations.push(`contrast=${contrast}`)
         if (optimization) transformations.push(`optimization=${optimization}`)
         if (sepia) transformations.push(`sepia=${sepia}`)
-
-        if (format) print('warn', 'format is not supported', { format })
-        if (additionalTransforms) {
-          print('warn', 'additionalTransforms are not supported', { additionalTransforms })
-        }
-        if (zoom) print('warn', 'zoom is not supported', { zoom })
-      }
-
-      if (focal) {
-        print('warn', 'focal is not yet supported', { focal })
-        if (Array.isArray(focal)) {
-          // transformations.push(`x_${focal[0]},y_${focal[1]},g_xy_center`)
-        } else {
-          // transformations.push(`g_${focal}`)
-        }
       }
 
       return this.bunnySrc + (transformations.length > 0 ? '?' + transformations.join('&') : '')
