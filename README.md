@@ -23,6 +23,15 @@ Vue.use(BunnyImage, {
 });
 ```
 
+
+## Release
+
+To release a new version, run the following command (you need to be in the [teamnovu](https://www.npmjs.com/teamnovu) npm organization):
+
+```bash
+ npm run release
+```
+
 ## Usage
 
 ```html
