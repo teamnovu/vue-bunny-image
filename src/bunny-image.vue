@@ -68,6 +68,11 @@ export default {
   },
   computed: {
     fileTypeSupported () {
+      if (!this.src) {
+        console.warn('src property was provided but seems empty.')
+        return ''
+      }
+
       const regex = /(?:\.([^.]+))?$/
       const fileExtension = regex.exec(this.src)[1]
 
@@ -86,6 +91,11 @@ export default {
     },
 
     bunnySrc () {
+      if (!this.src) {
+        console.warn('src property was provided but seems empty.')
+        return ''
+      }
+
       if (this.src.startsWith('/')) return this.$bunnyImage.bunnyBaseUrl + this.src
       else return this.$bunnyImage.bunnyBaseUrl + '/' + this.src
     },
