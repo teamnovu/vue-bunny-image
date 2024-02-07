@@ -22,15 +22,16 @@ const install = function installbunnyImage (Vue, options) {
   if (
     !bunnyBaseUrl ||
     typeof bunnyBaseUrl !== 'string' ||
-    bunnyBaseUrl.length === 0 ||
-    bunnyBaseUrl.endsWith('/')
+    bunnyBaseUrl.length === 0
   ) {
     throw new Error('bunnyBaseUrl was not properly configured.')
   }
 
+  const baseUrl = bunnyBaseUrl.endsWith('/') ? bunnyBaseUrl.slice(0, -1) : bunnyBaseUrl
+
   Vue.prototype.$bunnyImage = {
     screenSizes,
-    bunnyBaseUrl,
+    baseUrl,
     placeholderTransformation,
   }
 
