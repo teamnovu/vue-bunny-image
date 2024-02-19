@@ -31,7 +31,7 @@ const install = function installbunnyImage (Vue, options) {
 
   Vue.prototype.$bunnyImage = {
     screenSizes,
-    baseUrl,
+    bunnyBaseUrl: baseUrl,
     placeholderTransformation,
   }
 
