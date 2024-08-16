@@ -96,8 +96,12 @@ export default {
         return ''
       }
 
-      if (this.src.startsWith('/')) return this.$bunnyImage.bunnyBaseUrl + this.src
-      else return this.$bunnyImage.bunnyBaseUrl + '/' + this.src
+      if (this.src.startsWith('/')) {
+        return this.$bunnyImage.bunnyBaseUrl + this.src
+      }
+      else {
+        return this.$bunnyImage.bunnyBaseUrl + '/' + this.src
+      }
     },
 
     imgSrcSet () {
