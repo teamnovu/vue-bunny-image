@@ -96,6 +96,10 @@ export default {
         return ''
       }
 
+      if (this.src.startsWith('http://') || this.src.startsWith('https://')) {
+        return this.src
+      }
+
       if (this.src.startsWith('/')) {
         return this.$bunnyImage.bunnyBaseUrl + this.src
       }
